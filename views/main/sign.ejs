@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ED-HUB</title>
+    <link rel="shotcut icon" type="image/png" href="/imgs/logo2-edit.jpg" />
+    <link rel="stylesheet" href="/sign-style.css" />
+  </head>
+
+  <body>
+    <%- include('../partials/nav.ejs') %>
+    <div class="container" id="container">
+      <div class="form-container sign-up-container">
+        <form class="sign-up-form" action="/signup" method="POST">
+          <h1>Register</h1>
+          <!--           <div class="social-container">
+            <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+            <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+          <span>or use your email for registration</span> -->
+          <input type="text" placeholder="Full Name" name="name" required />
+          <div class="name error"></div>
+          <input type="email" placeholder="Email" name="email" required />
+          <div class="email error"></div>
+          <input
+            type="password"
+            placeholder="Password"
+            name="password"
+            required
+          />
+          <div class="password error"></div>
+          <button>Sign Up</button>
+        </form>
+      </div>
+      <div class="form-container sign-in-container">
+        <form class="login-form" action="/login" method="POST">
+          <h1>Sign in</h1>
+          <!--           <div class="social-container">
+            <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+            <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+          <span>or use your account</span> -->
+          <br />
+          <div class="email error login"></div>
+          <input type="email" placeholder="Email" name="email" required />
+          <input
+            type="password"
+            placeholder="Password"
+            name="password"
+            required
+          />
+          <div class="password error login"></div>
+          <a href="#">Forgot your password?</a>
+          <button>Sign In</button>
+        </form>
+      </div>
+      <div class="overlay-container">
+        <div class="overlay">
+          <div class="overlay-panel overlay-left">
+            <h1>Welcome Back!</h1>
+            <p>
+              To keep connected with us please login with your personal info
+            </p>
+            <button class="ghost" id="signIn">Sign In</button>
+          </div>
+          <div class="overlay-panel overlay-right">
+            <h1>Hello, Eklavyians!</h1>
+            <p>Enter your personal details and start your journey with us</p>
+            <button class="ghost" id="signUp">Sign Up</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="copyright">Copyright &copy; ED-HUB 2022</footer>
+  </body>
+  <script>
+    //for ui/ux
+    const signUpButton = document.getElementById("signUp");
+    const signInButton = document.getElementById("signIn");
+    const container = document.getElementById("container");
+    //console.log(errors);
+    signUpButton.addEventListener("click", () => {
+      container.classList.add("right-panel-active");
+    });
+
+    signInButton.addEventListener("click", () => {
+      container.classList.remove("right-panel-active");
+    });
+
+    // SignUp form
+    const suForm = document.querySelector(".sign-up-form");
+    const nameError = document.querySelector(".name.error");
+    const emailError = document.querySelector(".email.error");
+    const passwordError = document.querySelector(".password.error");
+
+    suForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      //reset errors
+      nameError.textContent = "";
+      emailError.textContent = "";
+      passwordError.textContent = "";
+      // get values
+      const name = suForm.name.value;
+      const email = suForm.email.value;
+      const password = suForm.password.value;
+
+      try {
+        const res = await fetch("/signup", {
+          method: "POST",
+          body: JSON.stringify({ name, email, password }),
+          headers: { "Content-Type": "application/json" },
+        });
+        const data = await res.json();
+        console.log(data);
+        if (data.errors) {
+          nameError.textContent = data.errors.name;
+          emailError.textContent = data.errors.email;
+          passwordError.textContent = data.errors.password;
+        }
+
+        if (data.user) {
+          console.log(data.user);
+          location.assign("/userhomepage");
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    });
+
+    //login form
+    const lgForm = document.querySelector(".login-form");
+    const lgEmailError = document.querySelector(".email.error.login");
+    const lgPasswordError = document.querySelector(".password.error.login");
+
+    lgForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      //reset errors
+      lgEmailError.textContent = "";
+      lgPasswordError.textContent = "";
+
+      // get values
+      const email = lgForm.email.value;
+      const password = lgForm.password.value;
+
+      try {
+        const res = await fetch("/login", {
+          method: "POST",
+          body: JSON.stringify({ email, password }),
+          headers: { "Content-Type": "application/json" },
+        });
+
+        const data = await res.json();
+        console.log("res.data:-", data);
+
+        if (data.errors) {
+          lgEmailError.textContent = data.errors.email;
+          lgPasswordError.textContent = data.errors.password;
+        }
+
+        if (data.user) {
+          location.assign("/userhomepage");
+        }
+      } catch (err) {
+        console.log(err);
+      }
+      console.log("login-end");
+    });
+  </script>
+</html>
